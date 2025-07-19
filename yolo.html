@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>缺陷识别工具</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .upload-area {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .upload-area:hover {
+            border-color: #999;
+        }
+        .preview {
+            display: flex;
+            justify-content: space-around;
+            gap: 20px;
+        }
+        .image-box {
+            flex: 1;
+            text-align: center;
+        }
+        .image-box img {
+            max-width: 100%;
+            max-height: 300px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .progress {
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>缺陷识别工具</h1>
+        <p>上传图片，系统会进行处理后返回新图片</p>
+        
+        <div class="upload-area" id="uploadArea">
+            <p>点击或拖拽图片到此处上传</p>
+            <input type="file" id="fileInput" accept="image/*" style="display: none;">
+        </div>
+        
+        <div class="preview">
+            <div class="image-box">
+                <h3>原始图片</h3>
+                <img id="originalImage" src="placeholder.jpg" alt="原始图片">
+            </div>
+            <div class="image-box">
+                <h3>处理后图片</h3>
+                <img id="processedImage" src="placeholder.jpg" alt="处理后图片">
+            </div>
+        </div>
+        
+        <button id="processBtn" disabled>处理图片</button>
+        <div class="progress" id="progressBar">
+            处理中，请稍候...
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('fileInput');
+            const uploadArea = document.getElementById('uploadArea');
+            const originalImage = document.getElementById('originalImage');
+            const processedImage = document.getElementById('processedImage');
+            const processBtn = document.getElementById('processBtn');
+            const progressBar = document.getElementById('progressBar');
+            
+            let selectedFile = null;
+            
+            // 点击上传区域触发文件选择
+            uploadArea.addEventListener('click', function() {
+                fileInput.click();
+            });
+            
+            // 拖拽功能
+            uploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#4CAF50';
+            });
+            
+            uploadArea.addEventListener('dragleave', function() {
+                uploadArea.style.borderColor = '#ccc';
+            });
+            
+            uploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#ccc';
+                
+                if (e.dataTransfer.files.length) {
+                    handleFileSelect(e.dataTransfer.files[0]);
+                }
+            });
+            
+            // 文件选择处理
+            fileInput.addEventListener('change', function() {
+                if (fileInput.files.length) {
+                    handleFileSelect(fileInput.files[0]);
+                }
+            });
+            
+            function handleFileSelect(file) {
+                // 检查是否为图片
+                if (!file.type.match('image.*')) {
+                    alert('请选择图片文件');
+                    return;
+                }
+                
+                selectedFile = file;
+                
+                // 显示预览
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    originalImage.src = e.target.result;
+                    processedImage.src = 'placeholder.jpg'; // 重置处理后的图片
+                    processBtn.disabled = false;
+                };
+                reader.readAsDataURL(file);
+            }
+            
+            // 处理按钮点击事件
+            processBtn.addEventListener('click', function() {
+                if (!selectedFile) return;
+                
+                processBtn.disabled = true;
+                progressBar.style.display = 'block';
+                
+                // 创建FormData对象并添加文件
+                const formData = new FormData();
+                formData.append('image', selectedFile);
+                
+                // 发送到后端
+                fetch('/process-image', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('处理失败');
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    // 显示处理后的图片
+                    const url = URL.createObjectURL(blob);
+                    processedImage.src = url;
+                    progressBar.style.display = 'none';
+                    processBtn.disabled = false;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('图片处理失败: ' + error.message);
+                    progressBar.style.display = 'none';
+                    processBtn.disabled = false;
+                });
+            });
+        });
+    </script>
+</body>
+</html>
