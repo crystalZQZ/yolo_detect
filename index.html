@@ -61,7 +61,7 @@
             padding: 30px;
             background: #f8f9fa;
         }
-
+        
         .upload-area {
             border: 3px dashed #667eea;
             border-radius: 10px;
@@ -82,19 +82,19 @@
             background: #f0f2ff;
             transform: scale(1.02);
         }
-
+        
         .upload-icon {
             font-size: 3em;
             color: #667eea;
             margin-bottom: 15px;
         }
-
+        
         .upload-text {
             font-size: 1.2em;
             color: #666;
             margin-bottom: 10px;
         }
-
+        
         .upload-hint {
             font-size: 0.9em;
             color: #999;
@@ -116,7 +116,7 @@
             width: 100%;
             margin-top: 20px;
         }
-
+        
         .process-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
@@ -378,7 +378,7 @@
             <h1>🔍 YOLO缺陷检测系统</h1>
             <p>上传图片，自动检测并标记缺陷</p>
         </div>
-
+        
         <div class="main-content">
             <div class="upload-section">
                 <div class="upload-area" id="uploadArea">
@@ -395,8 +395,8 @@
 
                 <div class="progress-bar" id="progressBar">
                     <div class="progress-fill" id="progressFill"></div>
-                </div>
-
+            </div>
+            
                 <div class="status-message" id="statusMessage"></div>
 
                 <div class="result-section" id="resultSection">
@@ -428,18 +428,18 @@
                     </div>
                 </div>
             </div>
-
+            
             <div class="history-section">
                 <h2 class="history-title">📚 历史记录</h2>
                 <div class="history-list" id="historyList">
                     <div style="text-align: center; color: #666; padding: 40px;">
                         暂无历史记录
-                    </div>
+                </div>
                 </div>
             </div>
-        </div>
-    </div>
-
+                </div>
+            </div>
+            
     <!-- 图片放大模态框 -->
     <div id="imageModal" class="modal">
         <span class="close-modal" onclick="closeModal()">&times;</span>
@@ -592,7 +592,7 @@
                 // 创建FormData
                 const formData = new FormData();
                 formData.append('image', file);
-
+                
                 // 模拟进度
                 const progressInterval = setInterval(() => {
                     const currentWidth = parseInt(progressFill.style.width) || 0;
