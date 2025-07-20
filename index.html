@@ -670,38 +670,29 @@
         async function loadHistory() {
             try {
                 const response = await fetch(`${API_URL}/history`);
-                if (!response.ok) {
-                    throw new Error('获取历史记录失败');
-                }
-
                 const history = await response.json();
                 
+                const historyList = document.getElementById('historyList');
+                
                 if (history.length === 0) {
-                    historyList.innerHTML = `
-                        <div style="text-align: center; color: #666; padding: 40px;">
-                            暂无历史记录
-                        </div>
-                    `;
+                    historyList.innerHTML = '<div style="text-align: center; color: #666; padding: 40px;">暂无历史记录</div>';
                     return;
                 }
-
+                
                 historyList.innerHTML = history.map(item => `
                     <div class="history-item" onclick="viewHistoryItem('${item.url}')">
-                        <img src="${API_URL}${item.url}" class="history-thumbnail" alt="${item.filename}">
+                        <img src="${API_URL}${item.url}" alt="历史图片" class="history-thumbnail">
                         <div class="history-info">
-                            <div class="history-filename">${item.filename}</div>
+                            <div class="history-filename">${item.filename.replace('result_', '')}</div>
                             <div class="history-time">${new Date(item.timestamp).toLocaleString()}</div>
                         </div>
                     </div>
                 `).join('');
-
+                
+                showStatus('已加载历史图片', 'info');
             } catch (error) {
                 console.error('加载历史记录失败:', error);
-                historyList.innerHTML = `
-                    <div style="text-align: center; color: #e74c3c; padding: 40px;">
-                        加载历史记录失败
-                    </div>
-                `;
+                showStatus('加载历史记录失败', 'error');
             }
         }
 
